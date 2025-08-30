@@ -3,13 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Techlystb Update</title>
+<title>Techlystb PWA Update</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00e676">
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- CSS -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -68,16 +74,21 @@
           </div>
         </div>
       </div>
+
+      <!-- Install Button -->
+      <button id="installBtn" style="display:none;">Install App</button>
+
+      <!-- Scan / Update Button -->
       <button class="scan-button" id="scanButton">
         <div class="scan-progress" id="scanProgress"></div>
         <div class="scan-grid" id="scanGrid"></div>
         <span class="check-icon" id="checkIcon">✓</span>
         <span id="buttonText">SCANNING UPDATE FILE...</span>
       </button>
+
       <div class="system-prompt" id="systemPrompt">
         > File verification complete. Signature valid. Safe to download.
       </div>
-      <button id="installBtn" style="display:none;">Install App</button>
     </div>
     <div class="card-footer">
       <div class="security-badge">
@@ -87,31 +98,40 @@
     </div>
   </div>
 </div>
-<button id="installBtn" style="display:none;">Download / Update Now</button>
 
 <script>
+/* -----------------
+   PWA Install Prompt
+------------------ */
 let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = 'inline-block';
+  document.getElementById('installBtn').style.display='inline-block';
 });
 
-installBtn.addEventListener('click', async () => {
-  if (deferredPrompt) {
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredPrompt){
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('PWA Installed');
+    const choice = await deferredPrompt.userChoice;
+    if(choice.outcome === 'accepted'){
+      console.log("✅ App Installed");
+      // Install হলে Blogger Home এ Redirect
+      window.location.href = "https://techlystb.blogspot.com";
     }
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
+    deferredPrompt=null;
+    document.getElementById('installBtn').style.display='none';
   }
 });
 
-// Scan Animation
+window.addEventListener('appinstalled', ()=>{
+  console.log("📲 App Installed Successfully!");
+  window.location.href = "https://techlystb.blogspot.com";
+});
+
+/* -----------------
+   Scan Animation
+------------------ */
 document.addEventListener('DOMContentLoaded', function() {
   const scanButton = document.getElementById('scanButton');
   const scanProgress = document.getElementById('scanProgress');
@@ -136,8 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
       systemPrompt.style.opacity='1';
 
       scanButton.onclick=function(){
-        const click_url = 'https://techlystb.github.io/Techlystb-App/index.html';
+        const click_url = 'https://techlystb.blogspot.com';
         window.open(click_url,'_blank');
+
         // Firebase Click Logging
         db.collection('clickLogs').add({
           timestamp: new Date(),
@@ -150,7 +171,9 @@ document.addEventListener('DOMContentLoaded', function() {
   startScan();
 });
 
-// Register SW
+/* -----------------
+   Service Worker
+------------------ */
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js')
     .then(()=>console.log('SW Registered'));
