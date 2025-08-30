@@ -80,13 +80,6 @@
 
 
 
-
-  <h1>Install Techlystb App</h1>
-  <p>Get the latest updates & access our blog faster.</p>
-  <button id="installBtn" class="hidden">📥 Install Now</button>
-
-      
-      
       
       <button id="installBtn" style="display:none;">Install App</button>
     </div>
@@ -101,72 +94,10 @@
 
 
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #0d1117;
-      color: #fff;
-      text-align: center;
-      flex-direction: column;
-    }
-    h1 { font-size: 22px; margin-bottom: 10px; }
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover { background: #1e40af; }
-    .hidden { display: none; }
-  </style>
-
-  <script>
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-
-    // beforeinstallprompt ইভেন্ট ধরার জন্য
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.classList.remove('hidden');
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
-          // ইনস্টল শেষে Blogger এ redirect
-          window.location.href = "https://techlystb.blogspot.com";
-        }
-        deferredPrompt = null;
-      }
-    });
-
-    // যদি আগে থেকেই ইনস্টল করা থাকে → auto redirect
-    window.addEventListener("appinstalled", () => {
-      window.location.href = "https://techlystb.blogspot.com";
-    });
-  </script>
-
-  <!-- Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
-
 
 
   
-<!--script>
+<script>
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
@@ -227,6 +158,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js')
     .then(()=>console.log('SW Registered'));
 }
-</script-->
+</script>
 </body>
 </html>
