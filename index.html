@@ -1,145 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Techlystb PWA Update</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00e676">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Techlystb App</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #0f172a;
+      color: #fff;
+      margin: 0;
+      padding: 50px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #installBtn, #updateBtn {
+      display: none;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #installBtn { background: #16a34a; color: #fff; }
+    #updateBtn { background: #2563eb; color: #fff; }
+  </style>
 </head>
 <body>
-<div class="update-container">
-  <div class="status-bar">
-    <div class="status-indicator">
-      <div class="status-dot"></div>
-      <div class="status-text">UPDATE READY</div>
-    </div>
-    <div class="update-pill">NEW VERSION</div>
-  </div>
-  <div class="update-card">
-    <div class="card-header">
-      <div class="update-icon">
-        <div class="circular-progress" id="circularProgress"></div>
-        <div class="icon-inner">
-          <div class="icon-arrow"></div>
-        </div>
-      </div>
-      <h2 class="update-title" id="mainTitle">Update Ready</h2>
-      <p class="update-subtitle">A new version is available for download</p>
-    </div>
-    <div class="card-content">
-      <div class="version-panel">
-        <div class="version-item">
-          <div class="version-label">CURRENT VERSION</div>
-          <div class="old-version">v4.2.1</div>
-        </div>
-        <div class="version-item">
-          <div class="version-label">NEW VERSION</div>
-          <div class="new-version">v5.0.0</div>
-        </div>
-      </div>
-      <div class="update-file">
-        <div class="file-header">
-          <div class="file-icon">
-            <span class="file-icon-text">APK</span>
-          </div>
-          <div class="file-info">
-            <div class="file-name" id="fileName">application.apk</div>
-            <div class="file-size">18.5 MB</div>
-          </div>
-        </div>
-        <div class="file-details">
-          <div class="detail-item">
-            <div class="detail-value">5.0.0</div>
-            <div class="detail-label">VERSION</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value ready-value">Ready</div>
-            <div class="detail-label">STATUS</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value">24h</div>
-            <div class="detail-label">EXPIRES</div>
-          </div>
-        </div>
-      </div>
+  <h1>🚀 Techlystb App</h1>
+  <p>Install the app to get updates and offline access.</p>
 
-      <!-- Install Button -->
-      <button id="installBtn" style="display:none;">Install App</button>
+  <button id="installBtn">📲 Install App</button>
+  <button id="updateBtn" onclick="window.location.reload()">⬇️ Download Update Now</button>
 
-      <!-- Scan / Update Button -->
-      <button class="scan-button" id="scanButton">
-        <div class="scan-progress" id="scanProgress"></div>
-        <div class="scan-grid" id="scanGrid"></div>
-        <span class="check-icon" id="checkIcon">✓</span>
-        <span id="buttonText">SCANNING UPDATE FILE...</span>
-      </button>
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+    const updateBtn = document.getElementById("updateBtn");
 
-      <div class="system-prompt" id="systemPrompt">
-        > File verification complete. Signature valid. Safe to download.
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="security-badge">
-        <span class="security-icon">✓</span>
-        <span class="security-text">Secure update verified</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-const scanButton = document.getElementById('scanButton');
-
-// Detect যদি অ্যাপ standalone মোডে রান হয়
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  // Already installed → Install বাটন hide
-  installBtn.style.display = "none";
-  scanButton.style.display = "inline-block";
-} else {
-  // Not installed → Install বাটন show করবো যখন event আসবে
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = "inline-block"; // show button
-  });
-}
-
-// Install Button Click
-installBtn.addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === "accepted") {
-      console.log("✅ App Installed");
-      installBtn.style.display = "none";
-      scanButton.style.display = "inline-block"; // show update button
-      window.location.href = "https://techlystb.blogspot.com";
+    // Service Worker Register
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").then(() => {
+        console.log("✅ Service Worker Registered");
+      });
     }
-    deferredPrompt = null;
-  }
-});
 
-// যদি অ্যাপ install হয়ে যায়
-window.addEventListener("appinstalled", () => {
-  console.log("📲 App Installed Successfully!");
-  installBtn.style.display = "none";
-  scanButton.style.display = "inline-block";
-  window.location.href = "https://techlystb.blogspot.com";
-});
-</script>
+    // Install Prompt Catch
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!localStorage.getItem("appInstalled")) {
+        installBtn.style.display = "inline-block";
+      }
+    });
+
+    // Install Button Click
+    installBtn.addEventListener("click", async () => {
+      installBtn.style.display = "none";
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("✅ App Installed");
+        localStorage.setItem("appInstalled", "true");
+        updateBtn.style.display = "inline-block";
+      }
+      deferredPrompt = null;
+    });
+
+    // Already Installed → Show Update Button
+    if (localStorage.getItem("appInstalled")) {
+      updateBtn.style.display = "inline-block";
+    }
+
+    // Detect App Installed Event (for Chrome)
+    window.addEventListener("appinstalled", () => {
+      console.log("🎉 App installed successfully!");
+      localStorage.setItem("appInstalled", "true");
+      installBtn.style.display = "none";
+      updateBtn.style.display = "inline-block";
+    });
+  </script>
 </body>
 </html>
