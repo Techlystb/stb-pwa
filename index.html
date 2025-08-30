@@ -1,86 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STB PWA</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0d1117">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install Techlystb App</title>
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d1117"/>
+
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: #fff;
-      text-align: center;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-    }
-    h1 {
-      font-size: 22px;
-      margin-bottom: 20px;
-    }
-    #installBtn {
-      background: #0078ff;
-      border: none;
+      background: #0d1117;
       color: #fff;
-      font-size: 16px;
-      padding: 12px 20px;
+      text-align: center;
+      flex-direction: column;
+    }
+    h1 { font-size: 22px; margin-bottom: 10px; }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
+      font-size: 16px;
     }
-    #installBtn:hover {
-      background: #005ec2;
-    }
+    button:hover { background: #1e40af; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Download / Update STB App</h1>
-  <button id="installBtn" style="display:none;">Install App</button>
+  <h1>Install Techlystb App 2</h1>
+  <p>Get the latest updates & access our blog faster.</p>
+  <button id="installBtn" class="hidden">📥 Install Now</button>
 
   <script>
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
 
-    // Before Install Event
+    // beforeinstallprompt ইভেন্ট ধরার জন্য
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = 'block';
+      installBtn.classList.remove('hidden');
     });
 
-    // Install Button Click
     installBtn.addEventListener('click', async () => {
-      installBtn.style.display = 'none';
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log("✅ App Installed");
-          // Install হলে Redirect হবে Blogger Home এ
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          // ইনস্টল শেষে Blogger এ redirect
           window.location.href = "https://techlystb.blogspot.com";
         }
         deferredPrompt = null;
       }
     });
 
-    // যদি অ্যাপ ইনস্টল করা থাকে তখনও Blogger Home এ Redirect হবে
-    window.addEventListener('appinstalled', () => {
-      console.log("📲 App Installed Successfully!");
+    // যদি আগে থেকেই ইনস্টল করা থাকে → auto redirect
+    window.addEventListener("appinstalled", () => {
       window.location.href = "https://techlystb.blogspot.com";
     });
   </script>
 
   <!-- Service Worker -->
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(reg => console.log("Service Worker Registered:", reg.scope))
-        .catch(err => console.log("SW Registration Failed:", err));
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 </body>
