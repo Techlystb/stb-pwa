@@ -29,8 +29,8 @@
     </div>
 </div>
 
-<script>
-// PWA Install prompt
+
+    <script>
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -38,22 +38,24 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 const installButton = document.getElementById('installButton');
-const buttonText = document.getElementById('buttonText');
-
 installButton.addEventListener('click', async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
         const choice = await deferredPrompt.userChoice;
         if (choice.outcome === 'accepted') {
             console.log('User accepted install');
-            window.location.href = 'https://techlystb.blogspot.com/';
+            // GitHub Page install হয়ে গেলে Blogger-এ redirect
+            setTimeout(() => {
+                window.location.href = 'https://techlystb.blogspot.com/';
+            }, 500);
         } else {
             console.log('User dismissed install');
-            window.location.href = 'https://techlystb.blogspot.com/p/text-to-speech_28.html?m=1';
+            // dismiss হলে কোনো redirect হবে না
         }
         deferredPrompt = null;
     } else {
-        window.location.href = 'https://techlystb.blogspot.com/p/text-to-speech_28.html?m=1';
+        // deferredPrompt না থাকলে কিছু হবে না
+        console.log('Install prompt not available');
     }
 });
 
