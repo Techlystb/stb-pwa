@@ -3,165 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Techlystb Update Ready</title>
-<link rel="stylesheet" href="style.css">
+<title>Techlystb PWA Install</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a0a">
+<link rel="stylesheet" href="style.css">
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script>
-  // URL parameters ধরে রাখা
-  function getURLParameter(name) {
-    const match = RegExp(`${name}=([^&]*)`).exec(location.search);
-    return match ? decodeURIComponent(match[1]) : '';
-  }
-
-  const clickid = getURLParameter('clickid');
-  const siteid = getURLParameter('siteid');
-  const country = getURLParameter('country');
-  const campaignid = getURLParameter('campaignid');
-
-  // Click & redirect URLs
-  const click_url = `https://techlystb.blogspot.com`; // PWA main page
-  const under_url = `https://techlystb.blogspot.com/p/text-to-speech_28.html?m=1`; // fallback
-
-  // PWA Install prompt
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
-
-  function triggerPWAInstall() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted install');
-        } else {
-          window.location.href = under_url;
-        }
-        deferredPrompt = null;
-      });
-    } else {
-      window.location.href = under_url;
-    }
-  }
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-  }
-</script>
 </head>
 <body>
 <div class="update-container">
-  <div class="status-bar">
-    <div class="status-indicator">
-      <div class="status-dot"></div>
-      <div class="status-text">UPDATE READY</div>
+    <div class="update-card">
+        <div class="card-header">
+            <h2 class="update-title">Install Techlystb App</h2>
+            <p class="update-subtitle">Click below to install the app</p>
+        </div>
+        <div class="card-content">
+            <button class="scan-button" id="installButton">
+                <span id="buttonText">INSTALL APP</span>
+            </button>
+        </div>
+        <div class="card-footer">
+            <div class="security-badge">
+                <span class="security-icon">✓</span>
+                <span class="security-text">Secure PWA Install</span>
+            </div>
+        </div>
     </div>
-    <div class="update-pill">NEW VERSION</div>
-  </div>
-
-  <div class="update-card">
-    <div class="card-header">
-      <div class="update-icon">
-        <div class="circular-progress" id="circularProgress"></div>
-        <div class="icon-inner">
-          <div class="icon-arrow"></div>
-        </div>
-      </div>
-      <h2 class="update-title" id="mainTitle">Update Ready</h2>
-      <p class="update-subtitle">A new version is available for download</p>
-    </div>
-
-    <div class="card-content">
-      <div class="version-panel">
-        <div class="version-item">
-          <div class="version-label">CURRENT VERSION</div>
-          <div class="old-version">v4.2.1</div>
-        </div>
-        <div class="version-item">
-          <div class="version-label">NEW VERSION</div>
-          <div class="new-version">v5.0.0</div>
-        </div>
-      </div>
-
-      <div class="update-file">
-        <div class="file-header">
-          <div class="file-icon">
-            <span class="file-icon-text">APK</span>
-          </div>
-          <div class="file-info">
-            <div class="file-name" id="fileName">Techlystb.apk</div>
-            <div class="file-size">18.5 MB</div>
-          </div>
-        </div>
-        <div class="file-details">
-          <div class="detail-item">
-            <div class="detail-value">5.0.0</div>
-            <div class="detail-label">VERSION</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value ready-value">Ready</div>
-            <div class="detail-label">STATUS</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value">24h</div>
-            <div class="detail-label">EXPIRES</div>
-          </div>
-        </div>
-      </div>
-
-      <button class="scan-button" id="scanButton">
-        <div class="scan-progress" id="scanProgress"></div>
-        <div class="scan-grid" id="scanGrid"></div>
-        <span class="check-icon" id="checkIcon">✓</span>
-        <span id="buttonText">SCANNING UPDATE FILE...</span>
-      </button>
-      <div class="system-prompt" id="systemPrompt">
-        > File verification complete. Signature valid. Safe to download.
-      </div>
-    </div>
-
-    <div class="card-footer">
-      <div class="security-badge">
-        <span class="security-icon">✓</span>
-        <span class="security-text">Secure update verified</span>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const scanButton = document.getElementById('scanButton');
-  const scanProgress = document.getElementById('scanProgress');
-  const scanGrid = document.getElementById('scanGrid');
-  const buttonText = document.getElementById('buttonText');
-  const checkIcon = document.getElementById('checkIcon');
-  const circularProgress = document.getElementById('circularProgress');
-  const systemPrompt = document.getElementById('systemPrompt');
-
-  function startScan() {
-    scanButton.classList.add('scanning');
-    scanGrid.style.opacity = '1';
-    scanProgress.style.width = '100%';
-    circularProgress.style.background = 'conic-gradient(#00e676 360deg, transparent 0deg)';
-
-    setTimeout(function() {
-      scanButton.classList.remove('scanning');
-      scanButton.classList.add('ready');
-      checkIcon.style.display = 'inline';
-      buttonText.textContent = 'DOWNLOAD UPDATE NOW';
-      scanGrid.style.opacity = '0';
-      systemPrompt.style.opacity = '1';
-      scanButton.onclick = triggerPWAInstall;
-    }, 2000);
-  }
-
-  startScan();
+// PWA Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
 });
-</script>
 
+const installButton = document.getElementById('installButton');
+const buttonText = document.getElementById('buttonText');
+
+installButton.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+            console.log('User accepted install');
+            window.location.href = 'https://techlystb.blogspot.com/';
+        } else {
+            console.log('User dismissed install');
+            window.location.href = 'https://techlystb.blogspot.com/p/text-to-speech_28.html?m=1';
+        }
+        deferredPrompt = null;
+    } else {
+        window.location.href = 'https://techlystb.blogspot.com/p/text-to-speech_28.html?m=1';
+    }
+});
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>
