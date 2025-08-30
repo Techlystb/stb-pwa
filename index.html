@@ -8,47 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-<script>
-// URL parameters ধরে রাখা
-function getURLParameter(name) {
-    const match = RegExp(`${name}=([^&]*)`).exec(location.search);
-    return match ? decodeURIComponent(match[1]) : '';
-}
 
-const clickid = getURLParameter('clickid');
-const siteid = getURLParameter('siteid');
-const country = getURLParameter('country');
-const campaignid = getURLParameter('campaignid');
-
-// Click & redirect URLs
-var click_url = `https://techlystb.blogspot.com`; // PWA main page
-var under_url = `https://techlystb.blogspot.com/p/blogs.html`; // fallback redirect
-
-// PWA Install prompt
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-});
-
-function triggerPWAInstall() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted install');
-            } else {
-                console.log('User dismissed install');
-                window.location.href = under_url;
-            }
-            deferredPrompt = null;
-        });
-    } else {
-        window.location.href = under_url;
-    }
-}
-</script>
- 
 </head>
 <body>
 <div class="update-container">
