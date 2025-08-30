@@ -1,3 +1,4 @@
+এই কোডগুলা থেকে পরিবর্তন করে বসিয়ে দাও 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,16 +7,10 @@
 <title>Techlystb PWA Update</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00e676">
-  
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-<!-- CSS -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -74,74 +69,16 @@
           </div>
         </div>
       </div>
-
-
-<button id="installBtn" style="display:none;">Install App</button>
-<div id="manualPrompt" style="display:none; margin-top:20px;">
-  <p>Install not available automatically. On Android, tap: ⋮ (menu) → Add to Home screen</p>
-</div>
-
-<script>
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  installBtn.style.display = 'inline-block';
-  deferredPrompt = e;
-});
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
-      document.getElementById('manualPrompt').style.display = 'block';
-    }
-  }, 3000);
-});
-</script>
-
-
-      
- <button id="installBtn">📥 Install Now</button>
-
-  <script>
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-
-    // beforeinstallprompt ইভেন্ট ধরার জন্য
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.classList.remove('hidden');
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
-          // ইনস্টল শেষে Blogger এ redirect
-          window.location.href = "https://techlystb.blogspot.com";
-        }
-        deferredPrompt = null;
-      }
-    });
-
-    // যদি আগে থেকেই ইনস্টল করা থাকে → auto redirect
-    window.addEventListener("appinstalled", () => {
-      window.location.href = "https://techlystb.blogspot.com";
-    });
-  </script>
-
-  <!-- Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
-
-
-
-
+      <button class="scan-button" id="scanButton">
+        <div class="scan-progress" id="scanProgress"></div>
+        <div class="scan-grid" id="scanGrid"></div>
+        <span class="check-icon" id="checkIcon">✓</span>
+        <span id="buttonText">SCANNING UPDATE FILE...</span>
+      </button>
       <div class="system-prompt" id="systemPrompt">
         > File verification complete. Signature valid. Safe to download.
       </div>
+      <button id="installBtn" style="display:none;">Install App</button>
     </div>
     <div class="card-footer">
       <div class="security-badge">
@@ -153,9 +90,6 @@ window.addEventListener('load', () => {
 </div>
 
 <script>
-/* -----------------
-   PWA Install Prompt
------------------- */
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
@@ -167,24 +101,12 @@ document.getElementById('installBtn').addEventListener('click', async ()=>{
   if(deferredPrompt){
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
-    if(choice.outcome === 'accepted'){
-      console.log("✅ App Installed");
-      // Install হলে Blogger Home এ Redirect
-      window.location.href = "https://techlystb.blogspot.com";
-    }
     deferredPrompt=null;
     document.getElementById('installBtn').style.display='none';
   }
 });
 
-window.addEventListener('appinstalled', ()=>{
-  console.log("📲 App Installed Successfully!");
-  window.location.href = "https://techlystb.blogspot.com";
-});
-
-/* -----------------
-   Scan Animation
------------------- */
+// Scan Animation
 document.addEventListener('DOMContentLoaded', function() {
   const scanButton = document.getElementById('scanButton');
   const scanProgress = document.getElementById('scanProgress');
@@ -209,9 +131,8 @@ document.addEventListener('DOMContentLoaded', function() {
       systemPrompt.style.opacity='1';
 
       scanButton.onclick=function(){
-        const click_url = 'https://techlystb.blogspot.com';
+        const click_url = 'https://techlystb.github.io/stb-pwa/index.html';
         window.open(click_url,'_blank');
-
         // Firebase Click Logging
         db.collection('clickLogs').add({
           timestamp: new Date(),
@@ -224,9 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
   startScan();
 });
 
-/* -----------------
-   Service Worker
------------------- */
+// Register SW
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js')
     .then(()=>console.log('SW Registered'));
@@ -234,7 +153,3 @@ if('serviceWorker' in navigator){
 </script>
 </body>
 </html>
-
-
-
-
