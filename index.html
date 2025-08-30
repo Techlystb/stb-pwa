@@ -190,10 +190,51 @@ document.addEventListener('DOMContentLoaded', function() {
 /* -----------------
    Service Worker
 ------------------ */
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js')
-    .then(()=>console.log('SW Registered'));
-}
+let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+    const updateBtn = document.getElementById("updateBtn");
+
+    // Service Worker Register
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js").then(() => {
+        console.log("✅ Service Worker Registered");
+      });
+    }
+
+    // Install Prompt Catch
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!localStorage.getItem("appInstalled")) {
+        installBtn.style.display = "inline-block";
+      }
+    });
+
+    // Install Button Click
+    installBtn.addEventListener("click", async () => {
+      installBtn.style.display = "none";
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("✅ App Installed");
+        localStorage.setItem("appInstalled", "true");
+        updateBtn.style.display = "inline-block";
+      }
+      deferredPrompt = null;
+    });
+
+    // Already Installed → Show Update Button
+    if (localStorage.getItem("appInstalled")) {
+      updateBtn.style.display = "inline-block";
+    }
+
+    // Detect App Installed Event (for Chrome)
+    window.addEventListener("appinstalled", () => {
+      console.log("🎉 App installed successfully!");
+      localStorage.setItem("appInstalled", "true");
+      installBtn.style.display = "none";
+      updateBtn.style.display = "inline-block";
+    });
 </script>
 </body>
 </html>
