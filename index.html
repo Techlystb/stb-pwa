@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Techlystb PWA Install</title>
 <link rel="manifest" href="manifest.json">
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <link rel="stylesheet" href="style.css">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
 <div class="update-container">
@@ -26,8 +26,8 @@
                     <div class="icon-arrow"></div>
                 </div>
             </div>
-            <h2 class="update-title">Update Ready</h2>
-            <p class="update-subtitle">Click below to install the Techlystb App</p>
+            <h2 class="update-title">Install Techlystb App</h2>
+            <p class="update-subtitle">Click below to install the PWA</p>
         </div>
 
         <div class="card-content">
@@ -60,9 +60,6 @@ installButton.addEventListener('click', async () => {
         const choice = await deferredPrompt.userChoice;
         if (choice.outcome === 'accepted') {
             console.log('User accepted install');
-            setTimeout(() => {
-                window.location.href = 'https://techlystb.blogspot.com/';
-            }, 500);
         } else {
             console.log('User dismissed install');
         }
@@ -77,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const circularProgress = document.getElementById('circularProgress');
     let progress = 0;
     const interval = setInterval(() => {
-        progress += 6; // 6deg per 33ms → 2s full circle
+        progress += 6;
         circularProgress.style.background = `conic-gradient(#00e676 ${progress}deg, transparent 0deg)`;
         if(progress >= 360) clearInterval(interval);
     }, 33);
@@ -89,6 +86,14 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log('Service Worker registered'))
     .catch(err => console.log('SW registration failed:', err));
 }
+
+// Open Blogger page when PWA launches
+window.addEventListener('load', () => {
+    // Open Blogger homepage only if app is launched standalone
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        window.location.href = 'https://techlystb.blogspot.com/?utm_source=pwa';
+    }
+});
 </script>
 </body>
 </html>
