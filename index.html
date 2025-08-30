@@ -83,28 +83,44 @@
       <div class="security-badge">
         <span class="security-icon">✓</span>
         <span class="security-text">Secure update verified</span>
+      
+      
+      
+      <button id="installBtn" style="display:none;">Download / Update Now</button>
+
+      
       </div>
     </div>
   </div>
 </div>
-
 <script>
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('installBtn').style.display='inline-block';
+  installBtn.style.display = 'inline-block';
 });
 
-document.getElementById('installBtn').addEventListener('click', async ()=>{
-  if(deferredPrompt){
+installBtn.addEventListener('click', async () => {
+  if (deferredPrompt) {
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    document.getElementById('installBtn').style.display='none';
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('PWA Installed');
+    }
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
   }
 });
 
+
+
+
+
+
+  
 // Scan Animation
 document.addEventListener('DOMContentLoaded', function() {
   const scanButton = document.getElementById('scanButton');
