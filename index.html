@@ -1,163 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Techlystb Update</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00e676">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install Techlystb App</title>
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d1117"/>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #0d1117;
+      color: #fff;
+      text-align: center;
+      flex-direction: column;
+    }
+    h1 { font-size: 22px; margin-bottom: 10px; }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #1e40af; }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-<div class="update-container">
-  <div class="status-bar">
-    <div class="status-indicator">
-      <div class="status-dot"></div>
-      <div class="status-text">UPDATE READY</div>
-    </div>
-    <div class="update-pill">NEW VERSION</div>
-  </div>
-  <div class="update-card">
-    <div class="card-header">
-      <div class="update-icon">
-        <div class="circular-progress" id="circularProgress"></div>
-        <div class="icon-inner">
-          <div class="icon-arrow"></div>
-        </div>
-      </div>
-      <h2 class="update-title" id="mainTitle">Update Ready</h2>
-      <p class="update-subtitle">A new version is available for download</p>
-    </div>
-    <div class="card-content">
-      <div class="version-panel">
-        <div class="version-item">
-          <div class="version-label">CURRENT VERSION</div>
-          <div class="old-version">v4.2.1</div>
-        </div>
-        <div class="version-item">
-          <div class="version-label">NEW VERSION</div>
-          <div class="new-version">v5.0.0</div>
-        </div>
-      </div>
-      <div class="update-file">
-        <div class="file-header">
-          <div class="file-icon">
-            <span class="file-icon-text">APK</span>
-          </div>
-          <div class="file-info">
-            <div class="file-name" id="fileName">application.apk</div>
-            <div class="file-size">18.5 MB</div>
-          </div>
-        </div>
-        <div class="file-details">
-          <div class="detail-item">
-            <div class="detail-value">5.0.0</div>
-            <div class="detail-label">VERSION</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value ready-value">Ready</div>
-            <div class="detail-label">STATUS</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-value">24h</div>
-            <div class="detail-label">EXPIRES</div>
-          </div>
-        </div>
-      </div>
-      <button class="scan-button" id="scanButton">
-        <div class="scan-progress" id="scanProgress"></div>
-        <div class="scan-grid" id="scanGrid"></div>
-        <span class="check-icon" id="checkIcon">✓</span>
-        <span id="buttonText">SCANNING UPDATE FILE...</span>
-      </button>
-      <div class="system-prompt" id="systemPrompt">
-        > File verification complete. Signature valid. Safe to download.
-      </div>
+  <h1>Install Techlystb App</h1>
+  <p>Get the latest updates & access our blog faster.</p>
+  <button id="installBtn" class="hidden">📥 Install Now</button>
 
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
 
+    // beforeinstallprompt ইভেন্ট ধরার জন্য
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.remove('hidden');
+    });
 
-      
-      <button id="installBtn" style="display:none;">Install App</button>
-    </div>
-    <div class="card-footer">
-      <div class="security-badge">
-        <span class="security-icon">✓</span>
-        <span class="security-text">Secure update verified</span>
-      </div>
-    </div>
-  </div>
-</div>
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          // ইনস্টল শেষে Blogger এ redirect
+          window.location.href = "https://techlystb.blogspot.com";
+        }
+        deferredPrompt = null;
+      }
+    });
 
+    // যদি আগে থেকেই ইনস্টল করা থাকে → auto redirect
+    window.addEventListener("appinstalled", () => {
+      window.location.href = "https://techlystb.blogspot.com";
+    });
+  </script>
 
-
-
-
-  
-<script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBtn').style.display='inline-block';
-});
-
-document.getElementById('installBtn').addEventListener('click', async ()=>{
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    document.getElementById('installBtn').style.display='none';
-  }
-});
-
-// Scan Animation
-document.addEventListener('DOMContentLoaded', function() {
-  const scanButton = document.getElementById('scanButton');
-  const scanProgress = document.getElementById('scanProgress');
-  const scanGrid = document.getElementById('scanGrid');
-  const buttonText = document.getElementById('buttonText');
-  const checkIcon = document.getElementById('checkIcon');
-  const circularProgress = document.getElementById('circularProgress');
-  const systemPrompt = document.getElementById('systemPrompt');
-
-  function startScan() {
-    scanButton.classList.add('scanning');
-    scanGrid.style.opacity='1';
-    scanProgress.style.width='100%';
-    circularProgress.style.background='conic-gradient(#00e676 360deg, transparent 0deg)';
-
-    setTimeout(function(){
-      scanButton.classList.remove('scanning');
-      scanButton.classList.add('ready');
-      checkIcon.style.display='inline';
-      buttonText.textContent='DOWNLOAD UPDATE NOW';
-      scanGrid.style.opacity='0';
-      systemPrompt.style.opacity='1';
-
-      scanButton.onclick=function(){
-        const click_url = 'https://techlystb.github.io/Techlystb-App/index.html';
-        window.open(click_url,'_blank');
-        // Firebase Click Logging
-        db.collection('clickLogs').add({
-          timestamp: new Date(),
-          userAgent: navigator.userAgent
-        });
-      };
-    }, 2000);
-  }
-
-  startScan();
-});
-
-// Register SW
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js')
-    .then(()=>console.log('SW Registered'));
-}
-</script>
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
