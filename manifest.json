@@ -1,10 +1,10 @@
 {
-  "name": "Techlystb",
+  "name": "Techlystb App",
   "short_name": "Techlystb",
-  "start_url": "https://techlystb.blogspot.com/",
+  "start_url": "https://techlystb.blogspot.com/?utm_source=pwa",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "theme_color": "#00e676",
   "icons": [
     {
       "src": "icon-192.png",
