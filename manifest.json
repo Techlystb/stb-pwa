@@ -1,7 +1,7 @@
 {
   "name": "stb App",
   "short_name": "Techlystb",
-  "start_url": "/stb-pwa/index.html",
+  "start_url": "https://techlystb.blogspot.com",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#00e676",
