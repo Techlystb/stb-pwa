@@ -74,7 +74,30 @@
           </div>
         </div>
       </div>
-    
+
+
+<button id="installBtn" style="display:none;">Install App</button>
+<div id="manualPrompt" style="display:none; margin-top:20px;">
+  <p>Install not available automatically. On Android, tap: ⋮ (menu) → Add to Home screen</p>
+</div>
+
+<script>
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installBtn.style.display = 'inline-block';
+  deferredPrompt = e;
+});
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+      document.getElementById('manualPrompt').style.display = 'block';
+    }
+  }, 3000);
+});
+</script>
+
+
+      
  <button id="installBtn">📥 Install Now</button>
 
   <script>
