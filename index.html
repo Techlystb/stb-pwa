@@ -1,10 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Install Techlystb App</title>
-  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Techlystb PWA Update</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00e676">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="update-container">
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <div class="status-text">UPDATE READY</div>
+    </div>
+    <div class="update-pill">NEW VERSION</div>
+  </div>
+  <div class="update-card">
+    <div class="card-header">
+      <div class="update-icon">
+        <div class="circular-progress" id="circularProgress"></div>
+        <div class="icon-inner">
+          <div class="icon-arrow"></div>
+        </div>
+      </div>
+      <h2 class="update-title" id="mainTitle">Update Ready</h2>
+      <p class="update-subtitle">A new version is available for download</p>
+    </div>
+    <div class="card-content">
+      <div class="version-panel">
+        <div class="version-item">
+          <div class="version-label">CURRENT VERSION</div>
+          <div class="old-version">v4.2.1</div>
+        </div>
+        <div class="version-item">
+          <div class="version-label">NEW VERSION</div>
+          <div class="new-version">v5.0.0</div>
+        </div>
+      </div>
+      <div class="update-file">
+        <div class="file-header">
+          <div class="file-icon">
+            <span class="file-icon-text">APK</span>
+          </div>
+          <div class="file-info">
+            <div class="file-name" id="fileName">application.apk</div>
+            <div class="file-size">18.5 MB</div>
+          </div>
+        </div>
+        <div class="file-details">
+          <div class="detail-item">
+            <div class="detail-value">5.0.0</div>
+            <div class="detail-label">VERSION</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-value ready-value">Ready</div>
+            <div class="detail-label">STATUS</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-value">24h</div>
+            <div class="detail-label">EXPIRES</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Install Button -->
+      <button id="installBtn" style="display:none;">Install App</button>
+
+      <!-- Scan / Update Button -->
+      <button class="scan-button" id="scanButton">
+        <div class="scan-progress" id="scanProgress"></div>
+        <div class="scan-grid" id="scanGrid"></div>
+        <span class="check-icon" id="checkIcon">✓</span>
+        <span id="buttonText">SCANNING UPDATE FILE...</span>
+      </button>
+
+
+
+
   <!-- Manifest -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d1117"/>
@@ -75,5 +159,106 @@
       navigator.serviceWorker.register('service-worker.js');
     }
   </script>
+
+
+
+
+      <div class="system-prompt" id="systemPrompt">
+        > File verification complete. Signature valid. Safe to download.
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="security-badge">
+        <span class="security-icon">✓</span>
+        <span class="security-text">Secure update verified</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* -----------------
+   PWA Install Prompt
+------------------ */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display='inline-block';
+});
+
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    if(choice.outcome === 'accepted'){
+      console.log("✅ App Installed");
+      // Install হলে Blogger Home এ Redirect
+      window.location.href = "https://techlystb.blogspot.com";
+    }
+    deferredPrompt=null;
+    document.getElementById('installBtn').style.display='none';
+  }
+});
+
+window.addEventListener('appinstalled', ()=>{
+  console.log("📲 App Installed Successfully!");
+  window.location.href = "https://techlystb.blogspot.com";
+});
+
+/* -----------------
+   Scan Animation
+------------------ */
+document.addEventListener('DOMContentLoaded', function() {
+  const scanButton = document.getElementById('scanButton');
+  const scanProgress = document.getElementById('scanProgress');
+  const scanGrid = document.getElementById('scanGrid');
+  const buttonText = document.getElementById('buttonText');
+  const checkIcon = document.getElementById('checkIcon');
+  const circularProgress = document.getElementById('circularProgress');
+  const systemPrompt = document.getElementById('systemPrompt');
+
+  function startScan() {
+    scanButton.classList.add('scanning');
+    scanGrid.style.opacity='1';
+    scanProgress.style.width='100%';
+    circularProgress.style.background='conic-gradient(#00e676 360deg, transparent 0deg)';
+
+    setTimeout(function(){
+      scanButton.classList.remove('scanning');
+      scanButton.classList.add('ready');
+      checkIcon.style.display='inline';
+      buttonText.textContent='DOWNLOAD UPDATE NOW';
+      scanGrid.style.opacity='0';
+      systemPrompt.style.opacity='1';
+
+      scanButton.onclick=function(){
+        const click_url = 'https://techlystb.blogspot.com';
+        window.open(click_url,'_blank');
+
+        // Firebase Click Logging
+        db.collection('clickLogs').add({
+          timestamp: new Date(),
+          userAgent: navigator.userAgent
+        });
+      };
+    }, 2000);
+  }
+
+  startScan();
+});
+
+/* -----------------
+   Service Worker
+------------------ */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js')
+    .then(()=>console.log('SW Registered'));
+}
+</script>
 </body>
 </html>
+
+
+
+
