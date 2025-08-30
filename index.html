@@ -36,12 +36,12 @@
                 <div class="version-panel">
                     <div class="version-item">
                         <div class="version-label">CURRENT VERSION</div>
-                        <div class="old-version">v0.2.1</div>
+                        <div class="old-version">v4.2.1</div>
                     </div>
                     
                     <div class="version-item">
                         <div class="version-label">NEW VERSION</div>
-                        <div class="new-version">v1.0.0</div>
+                        <div class="new-version">v5.0.0</div>
                     </div>
                 </div>
                 
@@ -52,13 +52,13 @@
                         </div>
                         <div class="file-info">
                             <div class="file-name" id="fileName">Techlystb.apk</div>
-                            <div class="file-size">0.5 KB</div>
+                            <div class="file-size">18.5 MB</div>
                         </div>
                     </div>
                     
                     <div class="file-details">
                         <div class="detail-item">
-                            <div class="detail-value">1.0.0</div>
+                            <div class="detail-value">5.0.0</div>
                             <div class="detail-label">VERSION</div>
                         </div>
                         
@@ -78,66 +78,52 @@
                 <div class="scan-progress" id="scanProgress"></div>
                 <div class="scan-grid" id="scanGrid"></div>
                 <span class="check-icon" id="checkIcon">✓</span>
-                <span id="buttonText">SCANNING UPDATE APP...</span>
+                <span id="buttonText">SCANNING UPDATE FILE...</span>
             </button>
             <div class="system-prompt" id="systemPrompt">
-                > App verification complete. Signature valid. Safe to download.
+                > File verification complete. Signature valid. Safe to download.
             </div>
-
-
-
-
-        
-        <div class="card-content">
-            <button class="scan-button" id="installButton">
-                <span id="buttonText">INSTALL APP</span>
-            </button>
-            <div class="system-prompt" id="systemPrompt">> App ready for install.</div>
         </div>
-
-        <div class="card-footer">
-            <div class="security-badge">
-                <span class="security-icon">✓</span>
-                <span class="security-text">Secure Techlystb Installing</span>
+<div class="card-footer">
+                <div class="security-badge">
+                    <span class="security-icon">✓</span>
+                    <span class="security-text">Secure update verified</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+<hr>
 <script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-});
-
-const installButton = document.getElementById('installButton');
-installButton.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
-            console.log('User accepted install');
-        } else {
-            console.log('User dismissed install');
-        }
-        deferredPrompt = null;
-    } else {
-        console.log('Install prompt not available');
-    }
-});
-
-// Circular progress animation
 document.addEventListener('DOMContentLoaded', function() {
+    const scanButton = document.getElementById('scanButton');
+    const scanProgress = document.getElementById('scanProgress');
+    const scanGrid = document.getElementById('scanGrid');
+    const buttonText = document.getElementById('buttonText');
+    const checkIcon = document.getElementById('checkIcon');
     const circularProgress = document.getElementById('circularProgress');
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 6;
-        circularProgress.style.background = `conic-gradient(#00e676 ${progress}deg, transparent 0deg)`;
-        if(progress >= 360) clearInterval(interval);
-    }, 33);
-});
+    const systemPrompt = document.getElementById('systemPrompt');
 
+    function startScan() {
+        scanButton.classList.add('scanning');
+        scanGrid.style.opacity = '1';
+        scanProgress.style.width = '100%';
+        circularProgress.style.background = 'conic-gradient(#00e676 360deg, transparent 0deg)';
+
+        setTimeout(function() {
+            scanButton.classList.remove('scanning');
+            scanButton.classList.add('ready');
+            checkIcon.style.display = 'inline';
+            buttonText.textContent = 'DOWNLOAD UPDATE NOW';
+            scanGrid.style.opacity = '0';
+            systemPrompt.style.opacity = '1';
+            scanButton.onclick = triggerPWAInstall;
+        }, 2000); // ২ সেকেন্ড delay
+    }
+
+    startScan();
+});
+</script>
+  <script>
 // Register Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
