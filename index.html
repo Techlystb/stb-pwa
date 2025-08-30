@@ -6,7 +6,6 @@
 <title>Techlystb PWA Install</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
 <div class="update-container">
@@ -29,8 +28,8 @@
     </div>
 </div>
 
-
-    <script>
+<script>
+// PWA Install prompt
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -44,18 +43,18 @@ installButton.addEventListener('click', async () => {
         const choice = await deferredPrompt.userChoice;
         if (choice.outcome === 'accepted') {
             console.log('User accepted install');
-            // GitHub Page install হয়ে গেলে Blogger-এ redirect
+            // Install হলে Blogger homepage-এ redirect
             setTimeout(() => {
                 window.location.href = 'https://techlystb.blogspot.com/';
             }, 500);
         } else {
             console.log('User dismissed install');
-            // dismiss হলে কোনো redirect হবে না
+            // dismiss হলে কিছু হবে না
         }
         deferredPrompt = null;
     } else {
-        // deferredPrompt না থাকলে কিছু হবে না
         console.log('Install prompt not available');
+        // deferredPrompt না থাকলে কিছু হবে না
     }
 });
 
