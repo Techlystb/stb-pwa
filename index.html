@@ -78,6 +78,9 @@
         > File verification complete. Signature valid. Safe to download.
       </div>
       <button id="installBtn" style="display:none;">Install App</button>
+      
+<button id="installBtn" style="display:none;">Download / Update Now</button>
+      
     </div>
     <div class="card-footer">
       <div class="security-badge">
@@ -87,8 +90,6 @@
     </div>
   </div>
 </div>
-
-<button id="installBtn" style="display:none;">Download / Update Now</button>
 
 <script>
 let deferredPrompt;
@@ -109,26 +110,6 @@ installBtn.addEventListener('click', async () => {
     }
     deferredPrompt = null;
     installBtn.style.display = 'none';
-  }
-});
-</script>
-
-
-  
-<script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBtn').style.display='inline-block';
-});
-
-document.getElementById('installBtn').addEventListener('click', async ()=>{
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    document.getElementById('installBtn').style.display='none';
   }
 });
 
