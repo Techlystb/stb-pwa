@@ -1,79 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Install Techlystb App</title>
-  
-  <!-- Manifest -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0d1117"/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Techlystb App</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #0d1117;
-      color: #fff;
       text-align: center;
-      flex-direction: column;
+      padding: 50px;
+      background: #111;
+      color: #fff;
     }
-    h1 { font-size: 22px; margin-bottom: 10px; }
     button {
-      background: #2563eb;
-      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
       border: none;
-      padding: 12px 24px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      margin-top: 20px;
     }
-    button:hover { background: #1e40af; }
-    .hidden { display: none; }
+    #installBtn { background: #28a745; color: #fff; }
+    #updateBtn { background: #007bff; color: #fff; }
   </style>
 </head>
 <body>
-  <h1>Install Techlystb App</h1>
-  <p>Get the latest updates & access our blog faster.</p>
-  <button id="installBtn" class="hidden">📥 Install Now</button>
+  <h1>🚀 Techlystb App</h1>
+  <p id="statusText">Checking app status...</p>
 
-  <script>
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+  <button id="installBtn" style="display:none;">📥 Install App</button>
+  <button id="updateBtn" style="display:none;">⬇️ Download Update Now</button>
 
-    // beforeinstallprompt ইভেন্ট ধরার জন্য
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.classList.remove('hidden');
-    });
+  <script src="app.js"></script>
+<script>
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+const updateBtn = document.getElementById('updateBtn');
+const statusText = document.getElementById('statusText');
 
-    installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
-          // ইনস্টল শেষে Blogger এ redirect
-          window.location.href = "https://techlystb.blogspot.com";
-        }
-        deferredPrompt = null;
-      }
-    });
+// Service Worker Register
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").then(() => {
+    console.log("✅ Service Worker Registered");
+  });
+}
 
-    // যদি আগে থেকেই ইনস্টল করা থাকে → auto redirect
-    window.addEventListener("appinstalled", () => {
-      window.location.href = "https://techlystb.blogspot.com";
-    });
-  </script>
+// Install Prompt Handle
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
 
-  <!-- Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+  // যদি অ্যাপ ইনস্টল না থাকে → Install বাটন দেখাও
+  if (!window.matchMedia('(display-mode: standalone)').matches) {
+    installBtn.style.display = "inline-block";
+    statusText.textContent = "App not installed yet!";
+  }
+});
+
+// Install Button Click
+installBtn.addEventListener("click", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      console.log("✅ App Installed");
+      statusText.textContent = "App installed successfully!";
+      installBtn.style.display = "none";
+      updateBtn.style.display = "inline-block";
     }
-  </script>
+    deferredPrompt = null;
+  }
+});
+
+// App Already Installed হলে Update Button দেখাবে
+window.addEventListener("appinstalled", () => {
+  console.log("✅ App installed event fired");
+  statusText.textContent = "App already installed!";
+  installBtn.style.display = "none";
+  updateBtn.style.display = "inline-block";
+});
+
+// যদি standalone মোডে রান হয় → Install বাটন লুকাও
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  statusText.textContent = "App running in installed mode.";
+  installBtn.style.display = "none";
+  updateBtn.style.display = "inline-block";
+}
+
+</script>
 </body>
 </html>
